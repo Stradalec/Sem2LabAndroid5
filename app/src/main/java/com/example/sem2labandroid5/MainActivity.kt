@@ -55,6 +55,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnBlue).setOnClickListener {
             drawingView.setColor(Color.BLUE)
         }
+        findViewById<Button>(R.id.btnClear).setOnClickListener {
+            drawingView.clear()
+        }
         findViewById<Button>(R.id.btnLoadImage).setOnClickListener {
             openGallery()
         }

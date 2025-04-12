@@ -43,6 +43,12 @@
             android:layout_height="60dp"
             android:layout_weight="1"
             android:text="Save"/>
+        <Button
+            android:id="@+id/btnClear"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="Clear"/>
     </LinearLayout>
 
     <LinearLayout

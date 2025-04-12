@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
@@ -51,6 +52,11 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         backgroundBitmap = bitmap
         invalidate()
     }
+    fun clear() {
+        paths.clear()
+        currentPath.reset()
+        invalidate()
+    }
     fun getBitmap(): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -74,6 +80,7 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         backgroundBitmap?.let {
             canvas.drawBitmap(it, null, Rect(0, 0, width, height), null)
         }
+        Log.d("1", "${paths.size}")
         for (path in paths) {
             canvas.drawPath(path, paint)
         }
