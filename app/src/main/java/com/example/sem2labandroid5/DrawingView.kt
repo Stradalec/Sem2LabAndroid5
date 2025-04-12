@@ -34,6 +34,11 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         }
         return super.onTouchEvent(event)
     }
+
+    fun setColor(color: Int) {
+        paint.color = color
+        invalidate()
+    }
     override fun onDraw(canvas: Canvas) {
         paths.forEach { canvas.drawPath(it, paint) }
         canvas.drawPath(currentPath, paint)
