@@ -1,15 +1,18 @@
 package com.example.sem2labandroid5
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 
 class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) {
+    private var backgroundBitmap: Bitmap? = null
     private val paint = Paint().apply {
         color = Color.BLACK
         strokeWidth = 5f
@@ -44,8 +47,36 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         paint.strokeWidth = size
         invalidate()
     }
+    fun setBackgroundBitmap(bitmap: Bitmap?) {
+        backgroundBitmap = bitmap
+        invalidate()
+    }
+    fun getBitmap(): Bitmap {
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+
+        backgroundBitmap?.let {
+            canvas.drawBitmap(it, null, Rect(0, 0, width, height), null)
+        }
+
+        for (path in paths) {
+            canvas.drawPath(path, paint)
+        }
+
+
+        canvas.drawPath(currentPath, paint)
+
+        return bitmap
+    }
+
     override fun onDraw(canvas: Canvas) {
-        paths.forEach { canvas.drawPath(it, paint) }
+        backgroundBitmap?.let {
+            canvas.drawBitmap(it, null, Rect(0, 0, width, height), null)
+        }
+        for (path in paths) {
+            canvas.drawPath(path, paint)
+        }
         canvas.drawPath(currentPath, paint)
     }
 }

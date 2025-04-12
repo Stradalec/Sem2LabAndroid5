@@ -30,7 +30,19 @@
             android:text="Blue"
             android:backgroundTint="@color/blue"/>
 
+        <Button
+            android:id="@+id/btnLoadImage"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="Load Image"/>
 
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="Save"/>
     </LinearLayout>
 
     <LinearLayout
