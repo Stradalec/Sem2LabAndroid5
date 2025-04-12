@@ -39,6 +39,11 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         paint.color = color
         invalidate()
     }
+
+    fun setBrushSize(size: Float) {
+        paint.strokeWidth = size
+        invalidate()
+    }
     override fun onDraw(canvas: Canvas) {
         paths.forEach { canvas.drawPath(it, paint) }
         canvas.drawPath(currentPath, paint)
