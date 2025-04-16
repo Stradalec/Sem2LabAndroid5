@@ -19,11 +19,12 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         strokeWidth = 5f
         style = Paint.Style.STROKE
     }
-    private val currentPath = Path()
+    private var currentPath = Path()
     private val paths = mutableListOf<Path>()
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+                currentPath = Path()
                 currentPath.moveTo(event.x, event.y)
                 return true
             }
@@ -32,6 +33,7 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
                 invalidate()
             }
             MotionEvent.ACTION_UP -> {
+                paths.add(Path(currentPath))
                 paths.add(currentPath)
                 currentPath.reset()
             }

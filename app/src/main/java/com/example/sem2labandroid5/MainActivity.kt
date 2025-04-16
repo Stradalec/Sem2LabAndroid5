@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     private val PICK_IMAGE_REQUEST = 100
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         drawingView = findViewById(R.id.drawingView)
         val seekBarBrushSize = findViewById<SeekBar>(R.id.seekBarBrushSize)
