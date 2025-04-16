@@ -68,7 +68,10 @@ class MainActivity : AppCompatActivity() {
             drawingView.setColor(Color.parseColor("#660099"))
         }
         findViewById<Button>(R.id.btnClear).setOnClickListener {
-            drawingView.clear()
+            drawingView.clearAllPaths()
+        }
+        findViewById<Button>(R.id.btnUndo).setOnClickListener {
+            drawingView.undoLastAction()
         }
         findViewById<Button>(R.id.btnLoadImage).setOnClickListener {
             openGallery()

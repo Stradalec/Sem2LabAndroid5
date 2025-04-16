@@ -87,6 +87,13 @@
             android:layout_weight="1"
             android:text="Очистить" />
 
+        <Button
+            android:id="@+id/btnUndo"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="Отменить" />
+
 
     </LinearLayout>
 
@@ -122,7 +129,7 @@
     <com.example.sem2labandroid5.DrawingView
         android:id="@+id/drawingView"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
