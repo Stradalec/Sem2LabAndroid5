@@ -7,8 +7,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
+import android.graphics.RectF
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
@@ -22,6 +22,14 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     private var currentStrokeWidth = 5f
     private var currentPath = Path()
     private val paths = mutableListOf<DrawingPath>()
+    private val borderPadding = 10f
+
+    private val borderStats = Paint().apply {
+        color = Color.GRAY
+        style = Paint.Style.STROKE
+        strokeWidth = 15f
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -76,6 +84,7 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         currentPath.reset()
         invalidate()
     }
+
     fun getBitmap(): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -84,6 +93,7 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         backgroundBitmap?.let {
             canvas.drawBitmap(it, null, Rect(0, 0, width, height), null)
         }
+
 
         val tempPaint = Paint(paint)
         for (drawingPath in paths) {
@@ -104,6 +114,15 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         backgroundBitmap?.let {
             canvas.drawBitmap(it, null, Rect(0, 0, width, height), null)
         }
+        val borderRectangle = RectF(
+            borderPadding,
+            borderPadding,
+            width - borderPadding,
+            height - borderPadding
+        )
+
+        canvas.drawRect(borderRectangle, borderStats)
+
         for (drawingPath in paths) {
             paint.color = drawingPath.color
             paint.strokeWidth = drawingPath.strokeWidth
