@@ -28,10 +28,12 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
                 currentPath.moveTo(event.x, event.y)
                 return true
             }
+
             MotionEvent.ACTION_MOVE -> {
                 currentPath.lineTo(event.x, event.y)
                 invalidate()
             }
+
             MotionEvent.ACTION_UP -> {
                 paths.add(Path(currentPath))
                 paths.add(currentPath)
@@ -50,15 +52,18 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         paint.strokeWidth = size
         invalidate()
     }
+
     fun setBackgroundBitmap(bitmap: Bitmap?) {
         backgroundBitmap = bitmap
         invalidate()
     }
+
     fun clear() {
         paths.clear()
         currentPath.reset()
         invalidate()
     }
+
     fun getBitmap(): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)

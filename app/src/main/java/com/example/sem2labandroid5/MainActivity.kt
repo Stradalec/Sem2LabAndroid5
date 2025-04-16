@@ -9,16 +9,15 @@ import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import java.io.File
 import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawingView: DrawingView
-    private val PICK_IMAGE_REQUEST = 100
+    private val PICK_IMAGE_REQUEST =
+        100 //Максимальное время ожидания загрузки картинки решил на всякий случай выразить через переменную.
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -47,12 +46,26 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        findViewById<Button>(R.id.btnRed).setOnClickListener {
+        findViewById<Button>(R.id.btnBlack).setOnClickListener {
             drawingView.setColor(Color.BLACK)
         }
 
         findViewById<Button>(R.id.btnBlue).setOnClickListener {
             drawingView.setColor(Color.BLUE)
+        }
+        findViewById<Button>(R.id.btnRed).setOnClickListener {
+            drawingView.setColor(Color.RED)
+        }
+
+        findViewById<Button>(R.id.btnYellow).setOnClickListener {
+            drawingView.setColor(Color.YELLOW)
+        }
+        findViewById<Button>(R.id.btnGreen).setOnClickListener {
+            drawingView.setColor(Color.GREEN)
+        }
+
+        findViewById<Button>(R.id.btnViolet).setOnClickListener {
+            drawingView.setColor(Color.parseColor("#660099"))
         }
         findViewById<Button>(R.id.btnClear).setOnClickListener {
             drawingView.clear()
@@ -65,10 +78,12 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
+
     private fun saveDrawing() {
         val bitmap = drawingView.getBitmap()
 
@@ -80,10 +95,10 @@ class MainActivity : AppCompatActivity() {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             stream.close()
 
-            Toast.makeText(this, "Saved to ${file.absolutePath}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Сохранено в: ${file.absolutePath}", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Не удалось сохранить", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -96,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                 drawingView.setBackgroundBitmap(bitmap)
             } catch (e: Exception) {
                 e.printStackTrace()
-                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Не удалось загрузить изображение", Toast.LENGTH_SHORT).show()
             }
         }
     }
