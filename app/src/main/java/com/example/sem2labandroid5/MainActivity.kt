@@ -9,112 +9,120 @@ import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var drawingView: DrawingView
-    private val pictureCode = 100
+    private val drawingViewModel: DrawingViewModel by viewModels()
+    private val pictureCode = 1
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         drawingView = findViewById(R.id.drawingView)
+
+
+        drawingViewModel.paths.observe(this) { drawingView.paths = it }
+        drawingViewModel.backgroundBitmap.observe(this) { drawingView.backgroundBitmap = it }
+        drawingViewModel.currentColor.observe(this) { drawingView.currentColor = it }
+        drawingViewModel.currentStrokeWidth.observe(this) { drawingView.currentStrokeWidth = it }
+
+        drawingView.onStartPath = { x, y -> drawingViewModel.startPath(x, y) }
+        drawingView.onChangePath = { x, y ->
+            drawingViewModel.addPointToPath(x, y)
+        }
+        drawingView.onFinishPath = { drawingViewModel.finishPath() }
+
         val seekBarBrushSize = findViewById<SeekBar>(R.id.seekBarBrushSize)
         val tvBrushSizeValue = findViewById<TextView>(R.id.tvBrushSizeValue)
 
-        val initialBrushSize = seekBarBrushSize.progress.toFloat()
-        drawingView.setBrushSize(initialBrushSize)
-        tvBrushSizeValue.text = initialBrushSize.toString()
-
-
         seekBarBrushSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val brushSize = progress.toFloat()
-                drawingView.setBrushSize(brushSize)
-                tvBrushSizeValue.text = brushSize.toString()
+                drawingViewModel.setStrokeWidth(progress.toFloat())
+                tvBrushSizeValue.text = progress.toString()
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
         findViewById<Button>(R.id.btnBlack).setOnClickListener {
-            drawingView.setColor(Color.BLACK)
+            drawingViewModel.setColor(Color.BLACK)
         }
-
         findViewById<Button>(R.id.btnBlue).setOnClickListener {
-            drawingView.setColor(Color.BLUE)
+            drawingViewModel.setColor(Color.BLUE)
         }
         findViewById<Button>(R.id.btnRed).setOnClickListener {
-            drawingView.setColor(Color.RED)
+            drawingViewModel.setColor(Color.RED)
         }
-
         findViewById<Button>(R.id.btnYellow).setOnClickListener {
-            drawingView.setColor(Color.YELLOW)
+            drawingViewModel.setColor(Color.YELLOW)
         }
         findViewById<Button>(R.id.btnGreen).setOnClickListener {
-            drawingView.setColor(Color.GREEN)
+            drawingViewModel.setColor(Color.GREEN)
+        }
+        findViewById<Button>(R.id.btnViolet).setOnClickListener {
+            drawingViewModel.setColor(Color.parseColor("#660099"))
         }
 
-        findViewById<Button>(R.id.btnViolet).setOnClickListener {
-            drawingView.setColor(Color.parseColor("#660099"))
-        }
-        findViewById<Button>(R.id.btnClear).setOnClickListener {
-            drawingView.clearAllPaths()
-        }
-        findViewById<Button>(R.id.btnUndo).setOnClickListener {
-            drawingView.undoLastAction()
-        }
+        findViewById<Button>(R.id.btnClear).setOnClickListener { drawingViewModel.clearAll() }
+        findViewById<Button>(R.id.btnUndo).setOnClickListener { drawingViewModel.undoLast() }
+
         findViewById<Button>(R.id.btnLoadImage).setOnClickListener {
             openGallery()
         }
+
         findViewById<Button>(R.id.btnSave).setOnClickListener {
-            saveDrawing()
+            val bitmap = drawingView.getBitmap()
+            val savedPath = drawingViewModel.saveDrawing(bitmap)
+            if (savedPath != null) {
+                Toast.makeText(this, "Сохранено в: $savedPath", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Не удалось сохранить", Toast.LENGTH_SHORT).show()
+            }
         }
 
+        drawingViewModel.saveStatus.observe(this) { status ->
+            status?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                drawingViewModel.resetStatus()
+            }
+        }
+        drawingViewModel.loadStatus.observe(this) { status ->
+            status?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                drawingViewModel.resetStatus()
+            }
+        }
     }
-
     private fun openGallery() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/jpeg", "image/png"))
+        }
         startActivityForResult(intent, pictureCode)
     }
-
-    private fun saveDrawing() {
-        val bitmap = drawingView.getBitmap()
-
-        val fileName = "drawing_${System.currentTimeMillis()}.png"
-        val file = File(getExternalFilesDir(null), fileName)
-
-        try {
-            val stream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            stream.close()
-
-            Toast.makeText(this, "Сохранено в: ${file.absolutePath}", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Не удалось сохранить", Toast.LENGTH_SHORT).show()
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == pictureCode && resultCode == RESULT_OK && data != null) {
-            val selectedImageUri = data.data
-            try {
-                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
-                drawingView.setBackgroundBitmap(bitmap)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(this, "Не удалось загрузить изображение", Toast.LENGTH_SHORT).show()
+
+        if (requestCode == pictureCode && resultCode == RESULT_OK) {
+            val uri = data?.data
+            uri?.let {
+                try {
+                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, it)
+                    drawingViewModel.setBackgroundBitmap(bitmap)
+                } catch (e: IOException) {
+                    Toast.makeText(this, "Ошибка загрузки", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
